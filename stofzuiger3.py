@@ -83,7 +83,8 @@ class Robot:
 		
 		
 ObjRobot = Robot()
-ObjSlam = slam()
+ObjSlam = Slam()
+print(ObjSlam.sensors)
 
 try:
 	while True:

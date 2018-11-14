@@ -1,10 +1,12 @@
 import numpy as np
 import nudged
 
-class slam():
-	def __init(self):
+class Slam():
+	def __init__(self):
 		#parameters
 		self.rejection_distance = 0.2
+		self.sensors = ['Laser_Sensor','Laser_Sensor0','Laser_Sensor1','Laser_Sensor2']
+		print('init slam')
 		
 		
 		#initialisatie
