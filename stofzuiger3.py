@@ -17,7 +17,10 @@ class Robot:
 		self.motors = ['linkermotor','rechtermotor']
 		self.sensors = ['Laser_Sensor','Laser_Sensor0','Laser_Sensor1','Laser_Sensor2']
 		self.rejection_distance = 0.2
-						
+		
+		#initialize slam
+		ObjSlam = Slam()
+		
 		#startup parameters
 		self.modus = 0 	#0 is ronde scannen
 						#1 is stukje rijden
@@ -61,7 +64,7 @@ class Robot:
 		self.distance = distance_sensor(self.handle,self.sensors,self.clientID,self.distance)
 		if lidar_positie > np.pi/2:
 			lidar_positie = 0
-			self.measured_points_x,self.measured_points_y = ObjSlam.slam(self.distance)
+			self.measured_points_x,self.measured_points_y,self.new_location = ObjSlam.calculations(self.distance,self.locatie)
 			self.locatie = self.new_location
 			real_locatie = get_position(self.handle,self.clientID,'Dummy')
 			ObjRobot.plotting()
@@ -83,8 +86,7 @@ class Robot:
 		
 		
 ObjRobot = Robot()
-ObjSlam = Slam()
-print(ObjSlam.sensors)
+
 
 try:
 	while True:
