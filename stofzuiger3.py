@@ -1,7 +1,7 @@
 from startup import *
 from robot_controle import *
 from driving_calc import *
-from slam import *
+from slam import Slam
 import numpy as np
 import sys
 from matplotlib import pyplot as plt
@@ -19,7 +19,7 @@ class Robot:
 		self.rejection_distance = 0.2
 		
 		#initialize slam
-		ObjSlam = Slam()
+		self.ObjSlam = Slam()
 		
 		#startup parameters
 		self.modus = 0 	#0 is ronde scannen
@@ -64,7 +64,7 @@ class Robot:
 		self.distance = distance_sensor(self.handle,self.sensors,self.clientID,self.distance)
 		if lidar_positie > np.pi/2:
 			lidar_positie = 0
-			self.measured_points_x,self.measured_points_y,self.new_location = ObjSlam.calculations(self.distance,self.locatie)
+			self.measured_points_x,self.measured_points_y,self.new_location = self.ObjSlam.calculations(self.distance,self.locatie)
 			self.locatie = self.new_location
 			real_locatie = get_position(self.handle,self.clientID,'Dummy')
 			ObjRobot.plotting()
