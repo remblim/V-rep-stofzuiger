@@ -31,6 +31,7 @@ class Robot:
 		self.geschiedenis_locatie_x = []
 		self.geschiedenis_locatie_y = []
 		self.slam_position = [0,0,0]
+		self.real_position = [0,0]
 		
 		self.clientID = make_connection()
 		self.handle = get_handle(self.clientID,self.Robot_parts)
@@ -44,11 +45,17 @@ class Robot:
 		self.locatie,self.old_motor_position=drive_calc(self.motor_position,self.old_motor_position,self.motors,self.omtrek_wiel,self.afstand_wielen,self.locatie,self.correctiefactor)
 		self.geschiedenis_locatie_x.append(self.locatie[0])
 		self.geschiedenis_locatie_y.append(self.locatie[1])
-	
+		
+		#echte positie ophalen uit vrep, eerst rotatie dan positie
+		orrientatie = get_orrientation(self.handle,self.clientID,'Dummy')
+		self.real_position = get_position(self.handle,self.clientID,'Dummy')
+		
+		
 	def drive(self):
 		self.driving(3,6)
 		self.ticks += 1
 		self.pos_calculate()
+		ObjRobot.plotting()
 		if self.ticks > 20:
 			self.modus = 0
 			self.ticks = 1
@@ -64,8 +71,7 @@ class Robot:
 		self.distance = distance_sensor(self.handle,self.sensors,self.clientID,self.distance)
 		if lidar_positie > np.pi/2:
 			lidar_positie = 0
-			self.measured_points_x,self.measured_points_y,self.new_location = self.ObjSlam.calculations(self.distance,self.locatie)
-			self.locatie = self.new_location
+			self.measured_points_x,self.measured_points_y,self.map_x,self.map_y,self.robot_map_x,self.robot_map_y,self.new_location = self.ObjSlam.calculations(self.distance,self.locatie)
 			real_locatie = get_position(self.handle,self.clientID,'Dummy')
 			ObjRobot.plotting()
 			self.distance = {'Laser_Sensor':[],'Laser_Sensor0':[],'Laser_Sensor1':[],'Laser_Sensor2':[]}
@@ -73,16 +79,20 @@ class Robot:
 		move_lidar_motor(self.handle,'Lidar_Motor',lidar_positie,self.clientID)
 		
 	def plotting(self):
+		#rood is berekende locatie
+		#groen is werkelijke locatie
 		plt.gcf().clear()
-		plt.scatter(self.measured_points_x,self.measured_points_y,color='yellow')
-		plt.scatter(self.landmark_x,self.landmark_y,color='purple')
 		plt.scatter(self.locatie[0],self.locatie[1],color='red')
-		if self.new_location is not [0,0,0]:
-			plt.scatter(self.new_location[0],self.new_location[1],color='blue')
+		if self.ticks > 0:
+			plt.scatter(self.real_position[1][1],-self.real_position[1][0],color='green')
+		if self.new_location is not False:
+			plt.scatter(self.new_location[0],self.new_location[1],color='orange')		
+		plt.scatter(self.measured_points_x,self.measured_points_y,color='purple')
+		plt.scatter(self.robot_map_x,self.robot_map_y,color='blue')
+		plt.scatter(self.map_x,self.map_y,color='yellow')
 		plt.axis('equal')
 		plt.draw
 		plt.pause(0.001)
-		
 		
 		
 ObjRobot = Robot()

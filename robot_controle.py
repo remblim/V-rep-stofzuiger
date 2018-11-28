@@ -33,3 +33,7 @@ def distance_sensor(handle,sensors,clientID,distance):
 	
 def get_position(handle,clientID,part):
 	return vrep.simxGetObjectPosition(clientID,handle[part],-1,vrep.simx_opmode_blocking)
+
+def get_orrientation(handle,clientID,part):
+	return vrep.simxGetObjectOrientation(clientID,handle[part],-1,vrep.simx_opmode_blocking)
+	
